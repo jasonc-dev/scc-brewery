@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -25,19 +26,33 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http.authorizeRequests(authorise -> {
-                authorise
-                        .antMatchers("/h2-console/**").permitAll() //do not use h2 in production!
-                        .antMatchers("/", "/webjars/**", "/login", "/resources/**").permitAll();
-            })
-            .authorizeRequests()
-            .anyRequest().authenticated()
-            .and()
-            .formLogin().and()
-            .httpBasic().and()
-            .csrf().ignoringAntMatchers("h2-console/**", "/api/**");
+            authorise
+                    .antMatchers("/h2-console/**").permitAll() //do not use h2 in production!
+                    .antMatchers("/", "/webjars/**", "/login", "/resources/**").permitAll();
+        })
+                .authorizeRequests()
+                .anyRequest().authenticated()
+                .and()
+                .formLogin(loginConfigurer -> {
+                    loginConfigurer
+                            .loginProcessingUrl("/login")
+                            .loginPage("/").permitAll()
+                            .successForwardUrl("/")
+                            .defaultSuccessUrl("/")
+                            .failureUrl("/?error");
+                })
+                .logout(logoutConfigurer -> {
+                    logoutConfigurer
+                            .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
+                            .logoutSuccessUrl("/?logout")
+                            .permitAll();
 
-            // h2 console config
-            http.headers().frameOptions().sameOrigin();
+                })
+                .httpBasic().and()
+                .csrf().ignoringAntMatchers("h2-console/**", "/api/**");
+
+        // h2 console config
+        http.headers().frameOptions().sameOrigin();
     }
 
     @Bean
