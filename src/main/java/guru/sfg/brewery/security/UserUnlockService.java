@@ -1,6 +1,7 @@
-package guru.sfg.brewery.repositories.security;
+package guru.sfg.brewery.security;
 
 import guru.sfg.brewery.domain.security.User;
+import guru.sfg.brewery.repositories.security.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,7 +18,7 @@ public class UserUnlockService {
 
     private final UserRepository userRepository;
 
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 300000)
     public void unlockAccounts() {
         log.debug("Running Unlock Accounts");
 
