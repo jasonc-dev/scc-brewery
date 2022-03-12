@@ -16,7 +16,7 @@ public class Google2faFailureHandler implements AuthenticationFailureHandler {
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
                                         AuthenticationException exception) throws IOException, ServletException {
 
-        log.debug("Forward tp 2fa");
+        log.debug("Forward to 2Fa");
 
         request.getRequestDispatcher("/user/verify2fa")
                 .forward(request, response);
